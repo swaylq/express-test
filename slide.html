@@ -1,0 +1,255 @@
+<html>
+<head>
+    <title>2016 Spring Web develop environment setup by at15</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Dongyue Web Studio 2016 Spring Web develop environment setup by at15">
+    <meta name="author" content="at15">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/css/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/css/theme/black.min.css"
+          id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/lib/css/zenburn.min.css">
+
+    <!-- Printing and PDF exports -->
+    <!-- FIXME: this does not work properly -->
+    <script>
+        var pdfCss = 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/css/print/pdf.min.css';
+        var paperCss = 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/css/print/paper.min.css';
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? pdfCss : paperCss;
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+    <style type="text/css">
+        #ghost {
+            position:fixed;
+            left:50px;
+            top:50px;
+            z-index:999;
+            width: 150px;
+            height:auto;
+        }
+        @media (max-width: 960px){
+            #ghost {
+                width: 50px;
+                height: auto;
+            }
+        } 
+    </style>
+</head>
+<body>
+<div class="reveal">
+    <img id="ghost" src="images/ghost.jpg"/>
+    <div class="slides">
+        <section>
+          <h2>Build a backend with express in 15m </h2>
+        </section>
+        <section>
+          <section>
+            <h2>Preparation</h2>
+            <ul>
+              <li>NodeJS</li>
+              <li>Mysql</li>
+            </ul>
+          </section>
+          <section>
+            <p>How to install them?</p>
+            <p>Just go to offical website</p>
+            <ul>
+              <li><a href="https://nodejs.org/en/">NodeJS</a></li>
+              <li><a href="http://dev.mysql.com/downloads/">Mysql</a></li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Todo list backend</h2>
+            <ul>
+              <li>Create a todo record</li>
+              <li>Get your todo list</li>
+            </ul>
+            <p class="fragment">If you want to save the data forever, you must use database</p>
+          </section>
+          <section>
+            <h2>Design the database</h2>
+            <p>user:</p>
+            <ul>
+              <li>id</li>
+              <li>username</li>
+              <li>password</li>
+            </ul>
+          </section>
+          <section>
+            <p>todo:</p>
+            <ul>
+              <li>id</li>
+              <li>uid</li>
+              <li>content</li>
+              <li>create_time</li>
+              <li>deadline</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Start the project
+                ```
+                $ npm init
+                $ npm install express --save
+                $ npm install mysql --save
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Create the app.js
+                ```
+                var express = require('express');
+                var app = express();
+                
+                app.get('/', function (req, res){
+                  res.send('Hello World');
+                });
+                
+                app.listen(3000, function (){
+                  console.log('Example app listening on port 3000!');
+                });
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Test your app
+                ```
+                $ node app.js
+                Example app listening on port 3000!
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Connect to Mysql
+                ```
+                var connection = mysql.createConnection({
+                  host: '127.0.0.1',
+                  user: 'root',
+                  password: 'vagrant',
+                  database: 'express-test'
+                });
+                
+                connection.connect(function(err) {
+                  if (err) {
+                    console.error('error connecting: ' + err.stack);
+                    return;
+                  }
+                  console.log('Database connect success');
+                });
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Test your connection
+                ```
+                $ node app.js
+                Example app listening on port 3000!
+                Database connect success
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Add create record api
+                ```
+                app.route('/todo')
+                  .post(function (req, res){
+                    var params = req.body;
+                    var sql  = "INSERT INTO todo (content, createtime) VALUES(?, ?)";
+                    var values = [params.content, null];
+                    sql = mysql.format(sql, values);
+                    connection.query(sql, function (err, results){
+                      res.send('success');
+                    });
+                  });
+                ```
+              </script>
+            </section>
+            <section data-markdown>
+              <script type="text/templates">
+                ## Add get records api
+                ```
+                app.route('/todo')
+                  .get(function (req, res){
+                    var sql = "SELECT * FROM todo";
+                    connection.query(sql, function (err, results){
+                      res.send(results);
+                    });
+                  })
+                ```
+              </script>
+            </section>
+            <section>
+              <p>Now, the basic backend has been built!</p>
+            </section>
+        </section>
+    </div>
+    
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/lib/js/head.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/js/reveal.js"></script>
+
+<script>
+    // Full list of configuration options available at:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+            {
+                src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/lib/js/classList.js',
+                condition: function () {
+                    return !document.body.classList;
+                }
+            },
+            {
+                src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/plugin/markdown/marked.js',
+                condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/plugin/markdown/markdown.js',
+                condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/plugin/highlight/highlight.js',
+                async: true,
+                callback: function () {
+                    hljs.initHighlightingOnLoad();
+                }
+            },
+            {src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/plugin/zoom-js/zoom.js', async: true},
+            {src: 'https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.2.0/plugin/notes/notes.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>

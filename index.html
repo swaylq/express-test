@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>Sway</title>
+  </head>
+  <body>
+    todo list:
+    <ul id="list">
+    </ul>
+    content:
+    <input id="content">
+    <button onclick="submit();">
+      submit
+    </button>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <script>
+      var getData = function get(){
+        $.ajax({
+          url: '/todo',
+          method: 'GET',
+          success: function (data){
+            $('ul').html("");
+            data.forEach(function (one){
+              var li = document.createElement('li');
+              $(li).html(one.content);
+              $('ul')[0].appendChild(li);
+            })
+          }
+        })
+      };
+      getData();
+      function submit() {
+        var content = $('#content').val();
+        var data = {content: content};
+        $.ajax({
+          url: '/todo',
+          method: 'POST',
+          data: data,
+          success: function (data){
+            getData();
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
